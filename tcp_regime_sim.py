@@ -431,34 +431,31 @@ def index():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCP OptiFlow - Congestion Control Analyzer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>TCP OptiFlow - Congestion Control Analyzer [PRTS_v2.4]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Share+Tech&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-main: #09080c;
-            --bg-card: #121016;
-            --bg-card-header: #18151f;
-            --bg-hover: #1c1924;
-            --border-color: #221f2d;
-            --border-focus: #443e5c;
+            /* Arknights Color Palette with the requested Purple-to-Orange Gradient */
+            --bg-main: #07050b;
+            --bg-card: rgba(14, 11, 22, 0.9);
+            --bg-card-header: #151121;
+            --border-color: rgba(127, 90, 240, 0.3);
+            --border-glow: rgba(127, 90, 240, 0.6);
             
-            /* Color Palette - Muted & Professional */
-            --primary: #826fed;       /* Sophisticated Muted Lavender */
-            --primary-dim: #221d3f;
-            --accent: #cda15f;        /* Refined Gold/Amber */
-            --accent-dim: #3a2e1c;
+            --primary: #7f5af0;       /* Muted Purple */
+            --accent: #ff9f43;        /* Glowing Gold/Orange */
             
-            /* Status Colors */
             --text-main: #e6e4eb;
-            --text-muted: #807c91;
-            --text-success: #4cd137;
-            --text-error: #e84118;
-            --terminal-bg: #07060a;
+            --text-muted: #746f88;
+            --text-success: #00ffbc;
+            --text-error: #ff4d4d;
+            --terminal-bg: #030205;
             
-            --radius-lg: 8px;
-            --radius-md: 6px;
-            --transition: all 0.15s ease;
+            --font-title: 'Share Tech', sans-serif;
+            --font-condensed: 'Barlow Condensed', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
 
         * {
@@ -468,12 +465,18 @@ def index():
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: var(--font-sans);
             background-color: var(--bg-main);
+            /* Dotted Grid Pattern for Tactical Monitor Feel */
+            background-image: 
+                radial-gradient(rgba(127, 90, 240, 0.08) 1px, transparent 1px),
+                linear-gradient(135deg, #07050b 0%, #110e1a 100%);
+            background-size: 24px 24px, 100% 100%;
+            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
-            line-height: 1.5;
-            padding: 2rem 1.5rem;
+            line-height: 1.4;
+            padding: 2rem;
         }
 
         .container {
@@ -484,68 +487,90 @@ def index():
             gap: 1.5rem;
         }
 
-        /* Minimalist Header */
+        /* Arknights Tactical Header */
         .app-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 0.5rem;
+            align-items: flex-end;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+        }
+
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: 0;
+            width: 120px;
+            height: 6px;
+            background-color: var(--accent);
         }
 
         .header-brand {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            gap: 2px;
         }
 
         .brand-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--text-main);
+            font-family: var(--font-title);
+            font-size: 2rem;
+            font-weight: 400;
+            letter-spacing: 3px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .brand-separator {
-            color: var(--border-color);
-            font-weight: 300;
+        .brand-title span.accent-glow {
+            color: var(--accent);
+            text-shadow: 0 0 8px rgba(255, 159, 67, 0.4);
         }
 
         .brand-sub {
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-family: var(--font-condensed);
+            font-size: 0.8rem;
+            font-weight: 600;
             color: var(--text-muted);
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        .status-badge {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 0.4rem 0.8rem;
-            border-radius: var(--radius-md);
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-muted);
+        .status-panel {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-align: right;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .status-line {
+            display: flex;
+            justify-content: flex-end;
             gap: 8px;
         }
 
-        .status-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: var(--accent);
-            display: inline-block;
+        .status-label {
+            color: var(--text-muted);
+        }
+
+        .status-value {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .status-value.active {
+            color: var(--accent);
+            text-shadow: 0 0 5px rgba(255, 159, 67, 0.3);
         }
 
         /* Layout Grid */
         .layout-grid {
             display: grid;
-            grid-template-columns: 1fr 1.2fr;
+            grid-template-columns: 1fr 1.3fr;
             gap: 1.5rem;
         }
 
@@ -555,34 +580,59 @@ def index():
             }
         }
 
-        /* Solid Cards */
+        /* Tactical Beveled Cards */
         .card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
+            position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            /* Beveled bottom-right corner */
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
         }
 
         .card-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.25rem;
             background-color: var(--bg-card-header);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-main);
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .card-subtitle {
-            font-size: 0.75rem;
+        .card-title::before {
+            content: '//';
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .card-code {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
             color: var(--text-muted);
-            margin-top: 2px;
-            display: block;
+            border: 1px solid rgba(127, 90, 240, 0.2);
+            padding: 2px 6px;
         }
 
         /* Config Card Details */
@@ -597,15 +647,15 @@ def index():
         .factor-group {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 1rem;
         }
 
         .factor-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 1.25rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            flex-direction: column;
+            gap: 6px;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(127, 90, 240, 0.1);
         }
 
         .factor-row:last-child {
@@ -613,16 +663,19 @@ def index():
             border-bottom: none;
         }
 
-        .factor-info {
+        .factor-header {
             display: flex;
-            flex-direction: column;
-            gap: 2px;
+            justify-content: space-between;
+            align-items: baseline;
         }
 
         .factor-label {
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-family: var(--font-condensed);
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
             color: var(--text-main);
+            text-transform: uppercase;
         }
 
         .factor-desc {
@@ -632,110 +685,145 @@ def index():
 
         .factor-badges {
             display: flex;
-            gap: 6px;
+            gap: 8px;
+            margin-top: 4px;
         }
 
         .badge {
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-md);
-            font-size: 0.75rem;
-            font-family: 'JetBrains Mono', monospace;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(127, 90, 240, 0.2);
+            color: var(--text-muted);
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
             font-weight: 500;
+            flex-grow: 1;
+            text-align: center;
+            position: relative;
         }
 
-        /* Buttons */
-        .btn-primary {
-            background-color: var(--primary);
+        /* Tactical active indicator for badges */
+        .badge.active {
+            background-color: rgba(127, 90, 240, 0.15);
+            border-color: var(--primary);
             color: #ffffff;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-radius: var(--radius-md);
+        }
+
+        .badge.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 4px;
+            height: 4px;
+            background-color: var(--accent);
+        }
+
+        /* Tactical Button */
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, #6c5ce7 100%);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            font-family: var(--font-condensed);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s ease;
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+            width: 100%;
+            margin-top: auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-            width: 100%;
-            margin-top: auto;
+            gap: 10px;
         }
 
         .btn-primary:hover:not(:disabled) {
-            background-color: #725fed;
+            background: var(--accent);
+            color: var(--bg-main);
+            border-color: var(--accent);
+            font-weight: 800;
         }
 
         .btn-primary:disabled {
-            background-color: var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-muted);
+            border-color: var(--border-color);
             cursor: not-allowed;
-        }
-
-        .btn-primary.running {
-            background-color: var(--accent);
-            color: var(--bg-main);
-            font-weight: 600;
+            clip-path: none;
         }
 
         .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
+            background: transparent;
+            border: 1px solid var(--primary);
             color: var(--text-main);
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-radius: var(--radius-md);
+            padding: 0.6rem 1.2rem;
+            font-family: var(--font-condensed);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s ease;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
 
         .btn-secondary:hover:not(:disabled) {
-            background-color: var(--bg-hover);
-            border-color: var(--border-focus);
+            background-color: rgba(127, 90, 240, 0.15);
+            color: #ffffff;
+            border-color: var(--accent);
         }
 
         /* Terminal styling */
         .terminal-body {
             background-color: var(--terminal-bg);
             padding: 1.25rem;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 0.8rem;
-            line-height: 1.6;
-            height: 320px;
+            line-height: 1.5;
+            height: 330px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 4px;
-            border-top: none;
+            border: 1px solid rgba(127, 90, 240, 0.15);
+            position: relative;
+        }
+
+        /* Scanline Overlay for retro-tactical screen */
+        .terminal-body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
 
         .terminal-line {
             display: flex;
             gap: 8px;
+            position: relative;
+            z-index: 3;
         }
 
         .terminal-prompt {
-            color: var(--primary);
+            color: var(--accent);
             user-select: none;
-        }
-
-        .terminal-time {
-            color: var(--text-muted);
-            user-select: none;
-            margin-right: 4px;
         }
 
         .text-info { color: var(--text-main); }
         .text-success { color: var(--text-success); }
         .text-error { color: var(--text-error); }
-        .text-iperf { color: var(--text-muted); opacity: 0.8; }
+        .text-iperf { color: var(--text-muted); opacity: 0.85; }
 
         /* Metrics Row */
         .metrics-grid {
@@ -753,62 +841,92 @@ def index():
         .metric-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
             padding: 1.25rem 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 4px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            height: 70%;
+            background-color: var(--primary);
+        }
+
+        .metric-card.accent-metric::after {
+            background-color: var(--accent);
         }
 
         .metric-label {
-            font-size: 0.75rem;
+            font-family: var(--font-condensed);
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 1.5px;
             color: var(--text-muted);
         }
 
         .metric-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-main);
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: #ffffff;
             margin-top: 2px;
         }
 
         .metric-trend {
             font-size: 0.7rem;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* Results & Tabs */
         .tabs {
             display: flex;
-            border-bottom: 1px solid var(--border-color);
             background-color: var(--bg-card-header);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .tab-link {
             background: none;
             border: none;
-            border-bottom: 2px solid transparent;
             color: var(--text-muted);
             padding: 1rem 1.5rem;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-family: var(--font-condensed);
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
+            transition: all 0.2s ease;
+            position: relative;
         }
 
         .tab-link:hover {
-            color: var(--text-main);
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.02);
         }
 
         .tab-link.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            color: #ffffff;
+            background-color: var(--bg-card);
+        }
+
+        .tab-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent);
         }
 
         .tab-content {
@@ -824,7 +942,6 @@ def index():
         .table-container {
             overflow-x: auto;
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
         }
 
         table {
@@ -837,12 +954,13 @@ def index():
         th {
             background-color: var(--bg-card-header);
             color: var(--text-muted);
+            font-family: var(--font-condensed);
             font-weight: 600;
             padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border-color);
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 1px;
         }
 
         td {
@@ -856,11 +974,11 @@ def index():
         }
 
         tr:hover td {
-            background-color: var(--bg-hover);
+            background-color: rgba(127, 90, 240, 0.05);
         }
 
         .font-mono-data {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-mono);
         }
 
         .action-footer {
@@ -884,17 +1002,16 @@ def index():
         }
 
         .charts-title {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-main);
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .chart-nav {
             display: flex;
-            gap: 8px;
             background-color: var(--bg-main);
-            padding: 2px;
-            border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
         }
 
@@ -902,22 +1019,23 @@ def index():
             background: none;
             border: none;
             color: var(--text-muted);
-            padding: 0.35rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            border-radius: calc(var(--radius-md) - 2px);
+            padding: 0.4rem 1rem;
+            font-family: var(--font-condensed);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s ease;
         }
 
         .chart-nav-btn:hover {
-            color: var(--text-main);
+            color: #ffffff;
         }
 
         .chart-nav-btn.active {
-            background-color: var(--bg-card);
-            color: var(--text-main);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            background-color: var(--primary);
+            color: #ffffff;
         }
 
         .chart-grid {
@@ -935,19 +1053,32 @@ def index():
         .chart-box {
             background-color: var(--bg-main);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
             padding: 1.25rem;
             height: 280px;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* Small Corner Crosshairs (+) for Arknights look */
+        .chart-box::before {
+            content: '+';
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            opacity: 0.5;
         }
 
         .chart-box h4 {
-            font-size: 0.75rem;
+            font-family: var(--font-condensed);
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 1px;
             text-align: center;
             margin-bottom: 12px;
         }
@@ -955,7 +1086,7 @@ def index():
         .chart-canvas-container {
             flex-grow: 1;
             position: relative;
-            height: 0; /* allows flexbox sizing */
+            height: 0;
         }
 
         .no-data {
@@ -988,12 +1119,18 @@ def index():
         <!-- Header -->
         <header class="app-header">
             <div class="header-brand">
-                <span class="brand-title">TCP OPTIFLOW</span>
-                <span class="brand-separator">|</span>
-                <span class="brand-sub">CONGESTION ANALYZER</span>
+                <span class="brand-title">TCP OPTI<span class="accent-glow">FLOW</span></span>
+                <span class="brand-sub">PRTS // CONGESTION_ANALYSIS_SYSTEM.v2.4</span>
             </div>
-            <div class="status-badge">
-                <span id="envText">SYSTEM: """ + sim_mode + """</span>
+            <div class="status-panel">
+                <div class="status-line">
+                    <span class="status-label">SYS_MODE:</span>
+                    <span class="status-value active">""" + sim_mode.upper() + """</span>
+                </div>
+                <div class="status-line">
+                    <span class="status-label">SYS_STATUS:</span>
+                    <span class="status-value">ONLINE</span>
+                </div>
             </div>
         </header>
 
@@ -1002,47 +1139,47 @@ def index():
             <!-- Configuration Card -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Experimental Configuration</h2>
-                    <span class="card-subtitle">Taguchi L9 Orthogonal Array (3³ Factorial)</span>
+                    <h2 class="card-title">Experimental Setup</h2>
+                    <span class="card-code">EX_01 // CTRL_PANEL</span>
                 </div>
                 <div class="card-body">
                     <div class="factor-group">
                         <div class="factor-row">
-                            <div class="factor-info">
+                            <div class="factor-header">
                                 <span class="factor-label">Factor A: TCP Congestion Control</span>
-                                <span class="factor-desc">Congestion avoidance algorithms</span>
+                                <span class="factor-desc">Congestion avoidance algorithms under test</span>
                             </div>
                             <div class="factor-badges">
-                                <span class="badge">Reno</span>
-                                <span class="badge">Cubic</span>
-                                <span class="badge">BBR</span>
+                                <span class="badge active">Reno</span>
+                                <span class="badge active">Cubic</span>
+                                <span class="badge active">BBR</span>
                             </div>
                         </div>
                         <div class="factor-row">
-                            <div class="factor-info">
+                            <div class="factor-header">
                                 <span class="factor-label">Factor B: Link Bandwidth</span>
                                 <span class="factor-desc">Bottleneck capacity constraints</span>
                             </div>
                             <div class="factor-badges">
-                                <span class="badge">100M</span>
-                                <span class="badge">500M</span>
-                                <span class="badge">1000M</span>
+                                <span class="badge active">100M</span>
+                                <span class="badge active">500M</span>
+                                <span class="badge active">1000M</span>
                             </div>
                         </div>
                         <div class="factor-row">
-                            <div class="factor-info">
+                            <div class="factor-header">
                                 <span class="factor-label">Factor C: Link Delay</span>
                                 <span class="factor-desc">Artificial round-trip latency</span>
                             </div>
                             <div class="factor-badges">
-                                <span class="badge">10ms</span>
-                                <span class="badge">50ms</span>
-                                <span class="badge">100ms</span>
+                                <span class="badge active">10ms</span>
+                                <span class="badge active">50ms</span>
+                                <span class="badge active">100ms</span>
                             </div>
                         </div>
                     </div>
                     <button id="btnRunSim" class="btn-primary" onclick="startSimulation()">
-                        <span>Run Analyzer Sequence</span>
+                        <span>Initiate Emulation Sequence</span>
                     </button>
                 </div>
             </div>
@@ -1050,13 +1187,13 @@ def index():
             <!-- Terminal Card -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">Terminal Console</h2>
-                    <span class="card-subtitle">Live execution output</span>
+                    <h2 class="card-title">Console Output</h2>
+                    <span class="card-code">EX_02 // LIVE_STREAM_PRTS</span>
                 </div>
                 <div id="terminal" class="terminal-body">
                     <div class="terminal-line">
-                        <span class="terminal-prompt">$</span>
-                        <span class="terminal-text text-info">System initialized. Ready to execute sequence.</span>
+                        <span class="terminal-prompt">&gt;&gt;</span>
+                        <span class="terminal-text text-info">PRTS initialized. Waiting for user execution command...</span>
                     </div>
                 </div>
             </div>
@@ -1070,11 +1207,11 @@ def index():
                 <span class="metric-trend">Across 9 trials</span>
             </div>
             <div class="metric-card">
-                <span class="metric-label">Flow Stability (Var)</span>
+                <span class="metric-label">Mean Stability (Var)</span>
                 <div class="metric-value" id="valAvgVariance">-</div>
                 <span class="metric-trend">Lower indicates higher stability</span>
             </div>
-            <div class="metric-card">
+            <div class="metric-card accent-metric">
                 <span class="metric-label">Mean Retransmission Rate</span>
                 <div class="metric-value" id="valAvgRetrans" style="color: var(--accent);">- %</div>
                 <span class="metric-trend">Protocol efficiency metric</span>
@@ -1084,7 +1221,7 @@ def index():
         <!-- Results Card (Hidden until data exists) -->
         <div class="card" id="resultsCard" style="display: none;">
             <div class="tabs">
-                <button class="tab-link active" onclick="switchTab('tableTab', this)">Experimental Matrix & Results</button>
+                <button class="tab-link active" onclick="switchTab('tableTab', this)">Experimental Matrix</button>
                 <button class="tab-link" onclick="switchTab('chartsTab', this)">Taguchi Main Effects Analysis</button>
             </div>
 
@@ -1111,7 +1248,7 @@ def index():
                 <div class="action-footer">
                     <button class="btn-secondary" onclick="exportCSV()">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top: 1px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        <span>Export CSV for Minitab / SPSS</span>
+                        <span style="margin-left: 4px;">Export CSV for Minitab / SPSS</span>
                     </button>
                 </div>
             </div>
@@ -1120,7 +1257,7 @@ def index():
             <div id="chartsTab" class="tab-content">
                 <div class="charts-wrapper">
                     <div class="charts-header">
-                        <span class="charts-title">Taguchi Factor Main Effects Plots (Data Means)</span>
+                        <span class="charts-title">Taguchi Factor Main Effects Plots</span>
                         <div class="chart-nav">
                             <button class="chart-nav-btn active" id="btnChartThroughput" onclick="changeChartResponse('throughput', this)">Throughput</button>
                             <button class="chart-nav-btn" id="btnChartRetrans" onclick="changeChartResponse('retrans_rate', this)">Retransmission</button>
@@ -1154,7 +1291,7 @@ def index():
 
         <div class="card" id="noDataCard">
             <div class="no-data">
-                No experimental data available. Execute the analyzer sequence to generate results.
+                No experimental data available. Execute the emulation sequence to generate results.
             </div>
         </div>
     </div>
@@ -1178,25 +1315,25 @@ def index():
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#18151f',
+                        backgroundColor: '#151121',
                         titleColor: '#e6e4eb',
                         bodyColor: '#e6e4eb',
-                        borderColor: '#221f2d',
+                        borderColor: 'rgba(127, 90, 240, 0.4)',
                         borderWidth: 1,
                         padding: 8,
                         displayColors: false,
-                        titleFont: { family: 'Inter', size: 11, weight: 'bold' },
+                        titleFont: { family: 'Share Tech', size: 12 },
                         bodyFont: { family: 'JetBrains Mono', size: 11 }
                     }
                 },
                 scales: {
                     y: {
-                        grid: { color: '#1b1824', drawBorder: false },
-                        ticks: { color: '#807c91', font: { family: 'JetBrains Mono', size: 9 } }
+                        grid: { color: 'rgba(127, 90, 240, 0.1)', drawBorder: false },
+                        ticks: { color: '#746f88', font: { family: 'JetBrains Mono', size: 9 } }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#807c91', font: { family: 'Inter', size: 10 } }
+                        ticks: { color: '#746f88', font: { family: 'Share Tech', size: 11 } }
                     }
                 }
             };
@@ -1212,11 +1349,11 @@ def index():
                         labels: [],
                         datasets: [{
                             data: [],
-                            borderColor: '#826fed',
+                            borderColor: '#7f5af0',
                             borderWidth: 2,
-                            pointBackgroundColor: '#cda15f',
-                            pointBorderColor: '#121016',
-                            pointBorderWidth: 1.5,
+                            pointBackgroundColor: '#ff9f43',
+                            pointBorderColor: '#07050b',
+                            pointBorderWidth: 2,
                             pointRadius: 4,
                             pointHoverRadius: 6,
                             tension: 0,
@@ -1233,9 +1370,9 @@ def index():
             currentResponse = responseType;
 
             const configMapping = {
-                throughput: { color: '#826fed', pointColor: '#cda15f' },
-                retrans_rate: { color: '#cda15f', pointColor: '#826fed' },
-                variance: { color: '#807c91', pointColor: '#826fed' }
+                throughput: { color: '#7f5af0', pointColor: '#ff9f43' },
+                retrans_rate: { color: '#ff9f43', pointColor: '#7f5af0' },
+                variance: { color: '#746f88', pointColor: '#7f5af0' }
             };
 
             const theme = configMapping[responseType];
@@ -1313,7 +1450,7 @@ def index():
             
             const promptSpan = document.createElement('span');
             promptSpan.className = 'terminal-prompt';
-            promptSpan.textContent = '$';
+            promptSpan.textContent = '>>';
             
             const textSpan = document.createElement('span');
             textSpan.className = `terminal-text text-${type}`;
@@ -1330,10 +1467,10 @@ def index():
             const btn = document.getElementById('btnRunSim');
             btn.disabled = true;
             btn.classList.add('running');
-            btn.innerHTML = '<span class="spinner"></span> <span>Running Analysis...</span>';
+            btn.innerHTML = '<span class="spinner"></span> <span>ANALYZING...</span>';
 
             document.getElementById('terminal').innerHTML = '';
-            appendTerminalLine(new Date().toLocaleTimeString(), 'Initiating HTTP handshake with server...', 'info');
+            appendTerminalLine(new Date().toLocaleTimeString(), 'Initializing tactical diagnostic handshake...', 'info');
 
             fetch('/api/run', { method: 'POST' })
                 .then(res => res.json())
