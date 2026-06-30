@@ -359,7 +359,7 @@ def compute_taguchi_analysis(results_list):
 # ==========================================
 # 4. Simulation Control Thread
 # ==========================================
-def run_simulation_sequence():
+def run_simulation_sequence(l9_matrix=None):
     """Background thread that executes the L9 experiment sequence."""
     global is_running, latest_results, main_effects
     
@@ -375,7 +375,10 @@ def run_simulation_sequence():
     
     start_time = time.time()
     
-    for run_config in L9_MATRIX:
+    # Fallback to default L9 matrix if none provided
+    matrix_to_run = l9_matrix if l9_matrix is not None else L9_MATRIX
+    
+    for run_config in matrix_to_run:
         run_id = run_config["run"]
         algo = run_config["algo"]
         bw = run_config["bw"]
@@ -683,40 +686,102 @@ def index():
             color: var(--text-muted);
         }
 
-        .factor-badges {
+        .factor-inputs {
             display: flex;
             gap: 8px;
             margin-top: 4px;
         }
 
-        .badge {
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(127, 90, 240, 0.2);
-            color: var(--text-muted);
-            padding: 0.35rem 0.75rem;
-            font-size: 0.8rem;
-            font-family: var(--font-mono);
-            font-weight: 500;
-            flex-grow: 1;
-            text-align: center;
+        .tactical-select-wrapper {
             position: relative;
+            flex-grow: 1;
+            flex-basis: 0;
         }
 
-        /* Tactical active indicator for badges */
-        .badge.active {
-            background-color: rgba(127, 90, 240, 0.15);
-            border-color: var(--primary);
-            color: #ffffff;
-        }
-
-        .badge.active::after {
-            content: '';
+        .tactical-select-wrapper::after {
+            content: '▼';
+            font-size: 0.5rem;
+            color: var(--text-muted);
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 4px;
-            height: 4px;
-            background-color: var(--accent);
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .tactical-select {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(127, 90, 240, 0.25);
+            color: #ffffff;
+            padding: 0.45rem 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align-last: center;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+            transition: var(--transition);
+        }
+
+        .tactical-select:focus:not(:disabled) {
+            border-color: var(--accent);
+        }
+
+        .tactical-select:disabled, .tactical-input:disabled {
+            color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(127, 90, 240, 0.25);
+            position: relative;
+            width: 100%;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+            transition: var(--transition);
+        }
+
+        .input-with-unit:focus-within {
+            border-color: var(--accent);
+        }
+
+        .tactical-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            padding: 0.45rem 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            width: 100%;
+            text-align: center;
+            outline: none;
+        }
+
+        /* Hide input spinners */
+        .tactical-input::-webkit-outer-spin-button,
+        .tactical-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .tactical-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .input-unit {
+            font-family: var(--font-condensed);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding-right: 8px;
+            user-select: none;
+            font-weight: 600;
         }
 
         /* Tactical Button */
@@ -1147,34 +1212,70 @@ def index():
                         <div class="factor-row">
                             <div class="factor-header">
                                 <span class="factor-label">Factor A: TCP Congestion Control</span>
-                                <span class="factor-desc">Congestion avoidance algorithms under test</span>
+                                <span class="factor-desc">Select 3 algorithms to compare</span>
                             </div>
-                            <div class="factor-badges">
-                                <span class="badge active">Reno</span>
-                                <span class="badge active">Cubic</span>
-                                <span class="badge active">BBR</span>
+                            <div class="factor-inputs">
+                                <div class="tactical-select-wrapper">
+                                    <select id="algo_level_1" class="tactical-select">
+                                        <option value="reno" selected>RENO</option>
+                                        <option value="cubic">CUBIC</option>
+                                        <option value="bbr">BBR</option>
+                                    </select>
+                                </div>
+                                <div class="tactical-select-wrapper">
+                                    <select id="algo_level_2" class="tactical-select">
+                                        <option value="reno">RENO</option>
+                                        <option value="cubic" selected>CUBIC</option>
+                                        <option value="bbr">BBR</option>
+                                    </select>
+                                </div>
+                                <div class="tactical-select-wrapper">
+                                    <select id="algo_level_3" class="tactical-select">
+                                        <option value="reno">RENO</option>
+                                        <option value="cubic">CUBIC</option>
+                                        <option value="bbr" selected>BBR</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="factor-row">
                             <div class="factor-header">
                                 <span class="factor-label">Factor B: Link Bandwidth</span>
-                                <span class="factor-desc">Bottleneck capacity constraints</span>
+                                <span class="factor-desc">Specify 3 bottleneck bandwidth levels</span>
                             </div>
-                            <div class="factor-badges">
-                                <span class="badge active">100M</span>
-                                <span class="badge active">500M</span>
-                                <span class="badge active">1000M</span>
+                            <div class="factor-inputs">
+                                <div class="input-with-unit">
+                                    <input type="number" id="bw_level_1" value="100" min="1" max="10000" class="tactical-input">
+                                    <span class="input-unit">Mbps</span>
+                                </div>
+                                <div class="input-with-unit">
+                                    <input type="number" id="bw_level_2" value="500" min="1" max="10000" class="tactical-input">
+                                    <span class="input-unit">Mbps</span>
+                                </div>
+                                <div class="input-with-unit">
+                                    <input type="number" id="bw_level_3" value="1000" min="1" max="10000" class="tactical-input">
+                                    <span class="input-unit">Mbps</span>
+                                </div>
                             </div>
                         </div>
                         <div class="factor-row">
                             <div class="factor-header">
                                 <span class="factor-label">Factor C: Link Delay</span>
-                                <span class="factor-desc">Artificial round-trip latency</span>
+                                <span class="factor-desc">Specify 3 artificial latency levels</span>
                             </div>
-                            <div class="factor-badges">
-                                <span class="badge active">10ms</span>
-                                <span class="badge active">50ms</span>
-                                <span class="badge active">100ms</span>
+                            <div class="factor-inputs">
+                                <div class="input-with-unit">
+                                    <input type="number" id="delay_level_1" value="10" min="1" max="1000" class="tactical-input">
+                                    <span class="input-unit">ms</span>
+                                </div>
+                                <div class="input-with-unit">
+                                    <input type="number" id="delay_level_2" value="50" min="1" max="1000" class="tactical-input">
+                                    <span class="input-unit">ms</span>
+                                </div>
+                                <div class="input-with-unit">
+                                    <input type="number" id="delay_level_3" value="100" min="1" max="1000" class="tactical-input">
+                                    <span class="input-unit">ms</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1257,7 +1358,7 @@ def index():
             <div id="chartsTab" class="tab-content">
                 <div class="charts-wrapper">
                     <div class="charts-header">
-                        <span class="charts-title">Taguchi Factor Main Effects Plots</span>
+                        <span class="charts-title">Taguchi Factor Main Effects Plots (Data Means)</span>
                         <div class="chart-nav">
                             <button class="chart-nav-btn active" id="btnChartThroughput" onclick="changeChartResponse('throughput', this)">Throughput</button>
                             <button class="chart-nav-btn" id="btnChartRetrans" onclick="changeChartResponse('retrans_rate', this)">Retransmission</button>
@@ -1469,22 +1570,48 @@ def index():
             btn.classList.add('running');
             btn.innerHTML = '<span class="spinner"></span> <span>ANALYZING...</span>';
 
+            toggleInputs(true);
+
             document.getElementById('terminal').innerHTML = '';
             appendTerminalLine(new Date().toLocaleTimeString(), 'Initializing tactical diagnostic handshake...', 'info');
 
-            fetch('/api/run', { method: 'POST' })
+            const bodyData = {
+                algos: [
+                    document.getElementById('algo_level_1').value,
+                    document.getElementById('algo_level_2').value,
+                    document.getElementById('algo_level_3').value
+                ],
+                bws: [
+                    parseInt(document.getElementById('bw_level_1').value),
+                    parseInt(document.getElementById('bw_level_2').value),
+                    parseInt(document.getElementById('bw_level_3').value)
+                ],
+                delays: [
+                    parseInt(document.getElementById('delay_level_1').value),
+                    parseInt(document.getElementById('delay_level_2').value),
+                    parseInt(document.getElementById('delay_level_3').value)
+                ]
+            };
+
+            fetch('/api/run', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyData)
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'started') {
                         setupLogStream();
                     } else {
-                        appendTerminalLine(new Date().toLocaleTimeString(), 'Execution aborted: ' + data.message, 'error');
+                        appendTerminalLine(new Date().toLocaleTimeString(), 'EXECUTION ABORTED: ' + data.message, 'error');
                         resetRunButton();
+                        toggleInputs(false);
                     }
                 })
                 .catch(err => {
-                    appendTerminalLine(new Date().toLocaleTimeString(), 'Server connection failed: ' + err, 'error');
+                    appendTerminalLine(new Date().toLocaleTimeString(), 'COMMUNICATION FAULT: ' + err, 'error');
                     resetRunButton();
+                    toggleInputs(false);
                 });
         }
 
@@ -1492,7 +1619,18 @@ def index():
             const btn = document.getElementById('btnRunSim');
             btn.disabled = false;
             btn.classList.remove('running');
-            btn.innerHTML = '<span>Run Analyzer Sequence</span>';
+            btn.innerHTML = '<span>Initiate Emulation Sequence</span>';
+        }
+
+        function toggleInputs(disabled) {
+            const inputs = [
+                'algo_level_1', 'algo_level_2', 'algo_level_3',
+                'bw_level_1', 'bw_level_2', 'bw_level_3',
+                'delay_level_1', 'delay_level_2', 'delay_level_3'
+            ];
+            inputs.forEach(id => {
+                document.getElementById(id).disabled = disabled;
+            });
         }
 
         function setupLogStream() {
@@ -1503,18 +1641,20 @@ def index():
                 
                 if (data.type === 'status' && data.status === 'done') {
                     eventSource.close();
-                    appendTerminalLine(new Date().toLocaleTimeString(), 'Sequence terminated. Pulling data matrices...', 'success');
+                    appendTerminalLine(new Date().toLocaleTimeString(), 'Diagnostic complete. Extracting result matrices.', 'success');
                     fetchResults();
                     resetRunButton();
+                    toggleInputs(false);
                 } else {
                     appendTerminalLine(data.time, data.text, data.type);
                 }
             };
 
             eventSource.onerror = function(err) {
-                console.error('SSE connection lost:', err);
+                console.error('SSE fault:', err);
                 eventSource.close();
                 resetRunButton();
+                toggleInputs(false);
             };
         }
 
@@ -1529,7 +1669,7 @@ def index():
                     }
                 })
                 .catch(err => {
-                    console.error('Failed to retrieve results:', err);
+                    console.error('Failed to pull results:', err);
                 });
         }
 
@@ -1558,12 +1698,12 @@ def index():
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="text-align: center;" class="font-mono-data">${r.run}</td>
-                    <td style="font-weight: 500; text-transform: uppercase;">${r.algo}</td>
+                    <td style="font-weight: 700; text-transform: uppercase;">${r.algo}</td>
                     <td style="text-align: right;" class="font-mono-data">${r.bw} Mbps</td>
                     <td style="text-align: right;" class="font-mono-data">${r.delay} ms</td>
-                    <td style="text-align: right; font-weight: 600;" class="font-mono-data">${r.throughput.toFixed(2)}</td>
+                    <td style="text-align: right; font-weight: 700;" class="font-mono-data">${r.throughput.toFixed(2)}</td>
                     <td style="text-align: right; color: var(--text-muted);" class="font-mono-data">${r.variance.toFixed(4)}</td>
-                    <td style="text-align: right; font-weight: 600; color: var(--accent);" class="font-mono-data">${r.retrans_rate.toFixed(4)}%</td>
+                    <td style="text-align: right; font-weight: 700; color: var(--accent);" class="font-mono-data">${r.retrans_rate.toFixed(4)}%</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1593,8 +1733,33 @@ def run_simulation():
         if is_running:
             return jsonify({"status": "error", "message": "Simulation is already running"}), 400
             
+    # Try parsing custom parameters from JSON
+    custom_l9 = None
+    try:
+        if request.is_json:
+            data = request.get_json() or {}
+            algos = data.get("algos")
+            bws = data.get("bws")
+            delays = data.get("delays")
+            
+            if algos and bws and delays and len(algos) == 3 and len(bws) == 3 and len(delays) == 3:
+                # Construct Taguchi L9 Orthogonal Array based on custom levels
+                custom_l9 = [
+                    {"run": 1, "algo": algos[0], "bw": int(bws[0]), "delay": int(delays[0])},
+                    {"run": 2, "algo": algos[0], "bw": int(bws[1]), "delay": int(delays[1])},
+                    {"run": 3, "algo": algos[0], "bw": int(bws[2]), "delay": int(delays[2])},
+                    {"run": 4, "algo": algos[1], "bw": int(bws[0]), "delay": int(delays[1])},
+                    {"run": 5, "algo": algos[1], "bw": int(bws[1]), "delay": int(delays[2])},
+                    {"run": 6, "algo": algos[1], "bw": int(bws[2]), "delay": int(delays[0])},
+                    {"run": 7, "algo": algos[2], "bw": int(bws[0]), "delay": int(delays[2])},
+                    {"run": 8, "algo": algos[2], "bw": int(bws[1]), "delay": int(delays[0])},
+                    {"run": 9, "algo": algos[2], "bw": int(bws[2]), "delay": int(delays[1])}
+                ]
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Invalid custom parameters: {str(e)}"}), 400
+        
     # Spawn background thread
-    thread = threading.Thread(target=run_simulation_sequence)
+    thread = threading.Thread(target=run_simulation_sequence, args=(custom_l9,))
     thread.daemon = True
     thread.start()
     
