@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 tcp_regime_sim.py - TCP OptiFlow Emulation & Analysis Software
-Styled with a Wuthering Waves 'Mornye' Cosmic Researcher Theme.
+A professional web-based dashboard and analysis tool.
 
 This script runs a web-based dashboard on port 5000. It performs a Taguchi L9
 orthogonal array experiment to analyze TCP Reno, Cubic, and BBR congestion
@@ -443,7 +443,7 @@ def index():
             --border-color: #221f2d;
             --border-focus: #443e5c;
             
-            /* Mornye Color Palette - Muted & Professional */
+            /* Color Palette - Muted & Professional */
             --primary: #826fed;       /* Sophisticated Muted Lavender */
             --primary-dim: #221d3f;
             --accent: #cda15f;        /* Refined Gold/Amber */
@@ -1520,7 +1520,7 @@ def export_results():
 # ==========================================
 if __name__ == "__main__":
     print("====================================================")
-    print("   TCP OptiFlow Emulation Software - Mornye Theme   ")
+    print("   TCP OptiFlow Emulation & Analysis Software       ")
     print("====================================================")
     print(f"Detected Mode: {sim_mode}")
     if not has_mininet:

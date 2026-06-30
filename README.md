@@ -2,7 +2,7 @@
 
 Welcome to **TCP OptiFlow**, an advanced network emulation and statistical analysis prototype designed to investigate TCP congestion control states in high-speed, high-latency networks. 
 
-This software is styled with a Wuthering Waves **Mornye**-inspired aesthetic—reflecting her role as a cosmic researcher and professor of Exostrider Engineering. It features a responsive, glassmorphic dark-mode web dashboard, live terminal logs streamed via Server-Sent Events (SSE), and interactive **Taguchi Main Effects Plots** powered by Chart.js.
+This software is designed as an advanced network emulation and statistical analysis prototype. It features a responsive, clean dark-mode web dashboard, live terminal logs streamed via Server-Sent Events (SSE), and interactive **Taguchi Main Effects Plots** powered by Chart.js.
 
 ---
 
