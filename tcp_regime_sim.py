@@ -425,42 +425,40 @@ def run_simulation_sequence():
 @app.route("/")
 def index():
     """Serves the main dashboard user interface."""
-    # Embedded HTML with Mornye Theme (Cosmic purple + Fusion orange)
     return """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCP OptiFlow - Mornye Research Lab</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <title>TCP OptiFlow - Congestion Control Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #0b0914;
-            --bg-gradient: linear-gradient(135deg, #0b0914 0%, #151128 100%);
-            --panel-bg: rgba(26, 21, 48, 0.6);
-            --panel-border: rgba(108, 92, 231, 0.25);
-            --panel-border-glow: rgba(108, 92, 231, 0.5);
+            --bg-main: #09080c;
+            --bg-card: #121016;
+            --bg-card-header: #18151f;
+            --bg-hover: #1c1924;
+            --border-color: #221f2d;
+            --border-focus: #443e5c;
             
-            /* Mornye Color Palette */
-            --primary: #7f5af0; /* Noble Lavender/Purple */
-            --primary-glow: rgba(127, 90, 240, 0.4);
-            --secondary: #a89fec; /* Soft Lavender */
+            /* Mornye Color Palette - Muted & Professional */
+            --primary: #826fed;       /* Sophisticated Muted Lavender */
+            --primary-dim: #221d3f;
+            --accent: #cda15f;        /* Refined Gold/Amber */
+            --accent-dim: #3a2e1c;
             
-            /* Fusion Element Accent (Gold/Fire Orange) */
-            --fusion: #ff9f43; 
-            --fusion-glow: rgba(255, 159, 67, 0.4);
-            --fusion-dark: #e67e22;
+            /* Status Colors */
+            --text-main: #e6e4eb;
+            --text-muted: #807c91;
+            --text-success: #4cd137;
+            --text-error: #e84118;
+            --terminal-bg: #07060a;
             
-            /* UI Colors */
-            --text-main: #f3f0ff;
-            --text-muted: #9f9bbd;
-            --text-success: #55efc4;
-            --text-error: #ff7675;
-            --terminal-bg: #06040a;
-            
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --radius-lg: 8px;
+            --radius-md: 6px;
+            --transition: all 0.15s ease;
         }
 
         * {
@@ -470,295 +468,280 @@ def index():
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-main);
             color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden;
-            background-attachment: fixed;
-        }
-
-        /* Ambient Cosmic Glows */
-        .ambient-glow-1 {
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(127, 90, 240, 0.12) 0%, rgba(0,0,0,0) 70%);
-            top: -100px;
-            right: -100px;
-            z-index: -1;
-            pointer-events: none;
-        }
-        
-        .ambient-glow-2 {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 159, 67, 0.05) 0%, rgba(0,0,0,0) 70%);
-            bottom: -200px;
-            left: -200px;
-            z-index: -1;
-            pointer-events: none;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        /* Glassmorphic Header */
-        header {
+        /* Minimalist Header */
+        .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
-            background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--panel-border);
-            border-radius: 20px;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
         }
 
-        .logo-container h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, var(--text-main), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .header-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .logo-container h1 span.accent-text {
-            color: var(--fusion);
-            -webkit-text-fill-color: var(--fusion);
-            text-shadow: 0 0 10px var(--fusion-glow);
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--text-main);
         }
 
-        .logo-container p {
+        .brand-separator {
+            color: var(--border-color);
+            font-weight: 300;
+        }
+
+        .brand-sub {
             font-size: 0.85rem;
+            font-weight: 500;
             color: var(--text-muted);
-            margin-top: 2px;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
 
-        .system-badge {
-            background: rgba(127, 90, 240, 0.15);
-            border: 1px solid var(--panel-border-glow);
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
+        .status-badge {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
             font-weight: 500;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 8px;
-            letter-spacing: 0.5px;
         }
 
-        .system-badge .dot {
-            width: 8px;
-            height: 8px;
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background-color: var(--fusion);
-            box-shadow: 0 0 8px var(--fusion);
+            background-color: var(--accent);
+            display: inline-block;
         }
 
-        /* Dashboard Layout Grid */
-        .grid-top {
+        /* Layout Grid */
+        .layout-grid {
             display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1.5rem;
         }
 
-        @media (max-width: 1024px) {
-            .grid-top {
+        @media (max-width: 960px) {
+            .layout-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* Glass Cards */
+        /* Solid Cards */
         .card {
-            background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--panel-border);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary);
-            opacity: 0.7;
-        }
-
-        .card.accent-card::before {
-            background: var(--fusion);
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-card-header);
         }
 
         .card-title {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 0.75rem;
-            letter-spacing: 0.5px;
+            color: var(--text-main);
         }
 
-        /* Configuration Panel Details */
-        .factor-list {
-            list-style: none;
+        .card-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Config Card Details */
+        .card-body {
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
-            margin-bottom: 1.5rem;
+            gap: 1.5rem;
             flex-grow: 1;
         }
 
-        .factor-item {
+        .factor-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .factor-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
         }
 
-        .factor-name {
+        .factor-row:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .factor-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .factor-label {
+            font-size: 0.9rem;
             font-weight: 500;
-            font-size: 0.95rem;
+            color: var(--text-main);
         }
 
-        .factor-levels {
+        .factor-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .factor-badges {
             display: flex;
             gap: 6px;
         }
 
-        .level-badge {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-family: 'Fira Code', monospace;
-            color: var(--secondary);
+        .badge {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
         }
 
-        .btn-run {
-            background: linear-gradient(135deg, var(--primary) 0%, #6c5ce7 100%);
-            color: white;
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
             border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: var(--radius-md);
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: 0 4px 15px var(--primary-glow);
-            letter-spacing: 1px;
-            text-transform: uppercase;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            width: 100%;
+            margin-top: auto;
         }
 
-        .btn-run:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(127, 90, 240, 0.6);
-            background: linear-gradient(135deg, #8a65ff 0%, #7d6eff 100%);
+        .btn-primary:hover:not(:disabled) {
+            background-color: #725fed;
         }
 
-        .btn-run:active:not(:disabled) {
-            transform: translateY(1px);
-        }
-
-        .btn-run:disabled {
-            background: rgba(255, 255, 255, 0.05);
+        .btn-primary:disabled {
+            background-color: var(--border-color);
             color: var(--text-muted);
-            border: 1px solid rgba(255,255,255,0.05);
             cursor: not-allowed;
-            box-shadow: none;
         }
 
-        .btn-run.running {
-            background: linear-gradient(135deg, var(--fusion) 0%, var(--fusion-dark) 100%);
-            box-shadow: 0 4px 15px var(--fusion-glow);
-            animation: pulse-glow 2s infinite;
+        .btn-primary.running {
+            background-color: var(--accent);
+            color: var(--bg-main);
+            font-weight: 600;
         }
 
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px var(--fusion-glow); }
-            50% { box-shadow: 0 0 20px var(--fusion-glow); }
-            100% { box-shadow: 0 0 5px var(--fusion-glow); }
-        }
-
-        /* Terminal Display */
-        .terminal-container {
-            background: var(--terminal-bg);
-            border: 1px solid rgba(127, 90, 240, 0.15);
-            border-radius: 16px;
-            padding: 1.25rem;
-            font-family: 'Fira Code', monospace;
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
             font-size: 0.85rem;
-            line-height: 1.5;
-            height: 350px;
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--bg-hover);
+            border-color: var(--border-focus);
+        }
+
+        /* Terminal styling */
+        .terminal-body {
+            background-color: var(--terminal-bg);
+            padding: 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            height: 320px;
             overflow-y: auto;
-            box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
+            border-top: none;
         }
 
         .terminal-line {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .terminal-prompt {
+            color: var(--primary);
+            user-select: none;
         }
 
         .terminal-time {
             color: var(--text-muted);
-            opacity: 0.5;
-            flex-shrink: 0;
             user-select: none;
+            margin-right: 4px;
         }
 
-        .terminal-text {
-            word-break: break-all;
-            white-space: pre-wrap;
-        }
-
-        .text-info { color: var(--terminal-text); }
+        .text-info { color: var(--text-main); }
         .text-success { color: var(--text-success); }
         .text-error { color: var(--text-error); }
-        .text-iperf { color: #81ecec; opacity: 0.9; }
+        .text-iperf { color: var(--text-muted); opacity: 0.8; }
 
-        /* Summary Metrics Grid */
+        /* Metrics Row */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
-            margin-bottom: 2rem;
         }
 
         @media (max-width: 768px) {
@@ -768,88 +751,69 @@ def index():
         }
 
         .metric-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 16px;
-            padding: 1.5rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
             display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            position: relative;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .metric-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: rgba(127, 90, 240, 0.15);
-            border: 1px solid var(--panel-border-glow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--secondary);
-            font-size: 1.5rem;
-        }
-
-        .metric-card.accent-metric .metric-icon {
-            background: rgba(255, 159, 67, 0.15);
-            border: 1px solid var(--fusion-glow);
-            color: var(--fusion);
-        }
-
-        .metric-info h3 {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+        .metric-label {
+            font-size: 0.75rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
         .metric-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-top: 4px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+            margin-top: 2px;
         }
 
-        /* Results & Tabs Section */
-        .analysis-section {
-            margin-top: 2rem;
+        .metric-trend {
+            font-size: 0.7rem;
+            color: var(--text-muted);
         }
 
-        .tabs-header {
+        /* Results & Tabs */
+        .tabs {
             display: flex;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-card-header);
         }
 
-        .tab-btn {
+        .tab-link {
             background: none;
             border: none;
+            border-bottom: 2px solid transparent;
             color: var(--text-muted);
-            font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
+            padding: 1rem 1.5rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            padding: 0.5rem 1.25rem;
             cursor: pointer;
-            border-radius: 8px;
             transition: var(--transition);
+            font-family: inherit;
         }
 
-        .tab-btn:hover {
+        .tab-link:hover {
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.02);
         }
 
-        .tab-btn.active {
-            color: var(--text-main);
-            background: rgba(127, 90, 240, 0.15);
-            border: 1px solid var(--panel-border-glow);
+        .tab-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
 
         .tab-content {
             display: none;
+            padding: 1.5rem;
         }
 
         .tab-content.active {
@@ -857,32 +821,34 @@ def index():
         }
 
         /* Table Design */
-        .table-wrapper {
+        .table-container {
             overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--panel-border);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.85rem;
             text-align: left;
-            font-size: 0.95rem;
         }
 
         th {
-            background: rgba(127, 90, 240, 0.1);
-            padding: 1rem;
+            background-color: var(--bg-card-header);
+            color: var(--text-muted);
             font-weight: 600;
-            color: var(--secondary);
-            border-bottom: 1px solid var(--panel-border);
-            letter-spacing: 0.5px;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            background: rgba(26, 21, 48, 0.3);
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
         }
 
         tr:last-child td {
@@ -890,26 +856,68 @@ def index():
         }
 
         tr:hover td {
-            background: rgba(127, 90, 240, 0.05);
+            background-color: var(--bg-hover);
         }
 
-        .highlight-cell {
-            font-family: 'Fira Code', monospace;
-            font-weight: 500;
+        .font-mono-data {
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Charts Layout */
-        .charts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .chart-selector {
+        .action-footer {
+            margin-top: 1.25rem;
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
-            margin-bottom: 1rem;
+        }
+
+        /* Charts styling */
+        .charts-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .charts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .charts-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .chart-nav {
+            display: flex;
+            gap: 8px;
+            background-color: var(--bg-main);
+            padding: 2px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.35rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: calc(var(--radius-md) - 2px);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chart-nav-btn:hover {
+            color: var(--text-main);
+        }
+
+        .chart-nav-btn.active {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         .chart-grid {
@@ -924,53 +932,47 @@ def index():
             }
         }
 
-        .chart-panel {
-            background: rgba(26, 21, 48, 0.4);
-            border: 1px solid var(--panel-border);
-            border-radius: 16px;
+        .chart-box {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
             padding: 1.25rem;
-            height: 300px;
-            position: relative;
-        }
-
-        .chart-panel h4 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-export {
-            align-self: flex-start;
-            background: transparent;
-            border: 1px solid var(--fusion);
-            color: var(--fusion);
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 1.5rem;
+            height: 280px;
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
         }
 
-        .btn-export:hover {
-            background: var(--fusion);
-            color: var(--bg-color);
-            box-shadow: 0 0 15px var(--fusion-glow);
+        .chart-box h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 12px;
         }
 
-        /* Loading Spinner */
+        .chart-canvas-container {
+            flex-grow: 1;
+            position: relative;
+            height: 0; /* allows flexbox sizing */
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* Spinner */
         .spinner {
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
-            border-top: 2px solid var(--text-main);
-            width: 20px;
-            height: 20px;
+            border-top: 2px solid currentColor;
+            width: 16px;
+            height: 16px;
             animation: spin 0.8s linear infinite;
             display: inline-block;
         }
@@ -979,131 +981,126 @@ def index():
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .no-data-msg {
-            text-align: center;
-            padding: 4rem;
-            color: var(--text-muted);
-            font-style: italic;
-        }
     </style>
 </head>
 <body>
-    <div class="ambient-glow-1"></div>
-    <div class="ambient-glow-2"></div>
-
     <div class="container">
         <!-- Header -->
-        <header>
-            <div class="logo-container">
-                <h1>TCP OPTI<span class="accent-text">FLOW</span></h1>
-                <p>Advanced Congestion Regime Emulation Software</p>
+        <header class="app-header">
+            <div class="header-brand">
+                <span class="brand-title">TCP OPTIFLOW</span>
+                <span class="brand-separator">|</span>
+                <span class="brand-sub">CONGESTION ANALYZER</span>
             </div>
-            <div class="system-badge">
-                <span class="dot"></span>
-                <span>SYSTEM: """ + sim_mode + """</span>
+            <div class="status-badge">
+                <span id="envText">SYSTEM: """ + sim_mode + """</span>
             </div>
         </header>
 
-        <!-- Top Section: Config and Terminal -->
-        <div class="grid-top">
-            <!-- Left: Configuration -->
+        <!-- Top Section -->
+        <div class="layout-grid">
+            <!-- Configuration Card -->
             <div class="card">
-                <h2 class="card-title">
-                    <span>Experimental Design</span>
-                    <span style="font-size: 0.8rem; color: var(--fusion); font-family: 'Fira Code';">Taguchi L9 (3³ Factorial)</span>
-                </h2>
-                <ul class="factor-list">
-                    <li class="factor-item">
-                        <div class="factor-name">Factor A: TCP Congestion Control</div>
-                        <div class="factor-levels">
-                            <span class="level-badge">Reno</span>
-                            <span class="level-badge">Cubic</span>
-                            <span class="level-badge">BBR</span>
+                <div class="card-header">
+                    <h2 class="card-title">Experimental Configuration</h2>
+                    <span class="card-subtitle">Taguchi L9 Orthogonal Array (3³ Factorial)</span>
+                </div>
+                <div class="card-body">
+                    <div class="factor-group">
+                        <div class="factor-row">
+                            <div class="factor-info">
+                                <span class="factor-label">Factor A: TCP Congestion Control</span>
+                                <span class="factor-desc">Congestion avoidance algorithms</span>
+                            </div>
+                            <div class="factor-badges">
+                                <span class="badge">Reno</span>
+                                <span class="badge">Cubic</span>
+                                <span class="badge">BBR</span>
+                            </div>
                         </div>
-                    </li>
-                    <li class="factor-item">
-                        <div class="factor-name">Factor B: Link Bandwidth</div>
-                        <div class="factor-levels">
-                            <span class="level-badge">100M</span>
-                            <span class="level-badge">500M</span>
-                            <span class="level-badge">1G</span>
+                        <div class="factor-row">
+                            <div class="factor-info">
+                                <span class="factor-label">Factor B: Link Bandwidth</span>
+                                <span class="factor-desc">Bottleneck capacity constraints</span>
+                            </div>
+                            <div class="factor-badges">
+                                <span class="badge">100M</span>
+                                <span class="badge">500M</span>
+                                <span class="badge">1000M</span>
+                            </div>
                         </div>
-                    </li>
-                    <li class="factor-item">
-                        <div class="factor-name">Factor C: Artificial Link Delay</div>
-                        <div class="factor-levels">
-                            <span class="level-badge">10ms</span>
-                            <span class="level-badge">50ms</span>
-                            <span class="level-badge">100ms</span>
+                        <div class="factor-row">
+                            <div class="factor-info">
+                                <span class="factor-label">Factor C: Link Delay</span>
+                                <span class="factor-desc">Artificial round-trip latency</span>
+                            </div>
+                            <div class="factor-badges">
+                                <span class="badge">10ms</span>
+                                <span class="badge">50ms</span>
+                                <span class="badge">100ms</span>
+                            </div>
                         </div>
-                    </li>
-                </ul>
-                <button id="btnRunSim" class="btn-run" onclick="startSimulation()">
-                    <span>Initiate Emulation</span>
-                </button>
+                    </div>
+                    <button id="btnRunSim" class="btn-primary" onclick="startSimulation()">
+                        <span>Run Analyzer Sequence</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Right: Real-time Terminal -->
-            <div class="card accent-card">
-                <h2 class="card-title">
-                    <span>Research Terminal Logs</span>
-                    <span style="font-size: 0.8rem; color: var(--text-muted); font-family: 'Fira Code';">SSE Connection</span>
-                </h2>
-                <div id="terminal" class="terminal-container">
+            <!-- Terminal Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Terminal Console</h2>
+                    <span class="card-subtitle">Live execution output</span>
+                </div>
+                <div id="terminal" class="terminal-body">
                     <div class="terminal-line">
-                        <span class="terminal-time">[System]</span>
-                        <span class="terminal-text text-info">Ready to initiate. Click 'Initiate Emulation' to start testing.</span>
+                        <span class="terminal-prompt">$</span>
+                        <span class="terminal-text text-info">System initialized. Ready to execute sequence.</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Middle Section: Key Metrics -->
+        <!-- Metrics Row (Hidden until data exists) -->
         <div class="metrics-grid" id="metricsGrid" style="display: none;">
             <div class="metric-card">
-                <div class="metric-icon">⚡</div>
-                <div class="metric-info">
-                    <h3>Average Throughput</h3>
-                    <div class="metric-value" id="valAvgThroughput">- Mbps</div>
-                </div>
+                <span class="metric-label">Mean Throughput</span>
+                <div class="metric-value" id="valAvgThroughput">- Mbps</div>
+                <span class="metric-trend">Across 9 trials</span>
             </div>
             <div class="metric-card">
-                <div class="metric-icon">⚖️</div>
-                <div class="metric-info">
-                    <h3>Mean Stability Index (Variance)</h3>
-                    <div class="metric-value" id="valAvgVariance">-</div>
-                </div>
+                <span class="metric-label">Flow Stability (Var)</span>
+                <div class="metric-value" id="valAvgVariance">-</div>
+                <span class="metric-trend">Lower indicates higher stability</span>
             </div>
-            <div class="metric-card accent-metric">
-                <div class="metric-icon" style="color: var(--fusion);">⚠️</div>
-                <div class="metric-info">
-                    <h3>Average Retransmission Rate</h3>
-                    <div class="metric-value" id="valAvgRetrans" style="color: var(--fusion);">- %</div>
-                </div>
+            <div class="metric-card">
+                <span class="metric-label">Mean Retransmission Rate</span>
+                <div class="metric-value" id="valAvgRetrans" style="color: var(--accent);">- %</div>
+                <span class="metric-trend">Protocol efficiency metric</span>
             </div>
         </div>
 
-        <!-- Bottom Section: Results Tabs -->
+        <!-- Results Card (Hidden until data exists) -->
         <div class="card" id="resultsCard" style="display: none;">
-            <div class="tabs-header">
-                <button class="tab-btn active" onclick="switchTab('tableTab', this)">Experimental Matrix</button>
-                <button class="tab-btn" onclick="switchTab('chartsTab', this)">Taguchi Main Effects Analysis</button>
+            <div class="tabs">
+                <button class="tab-link active" onclick="switchTab('tableTab', this)">Experimental Matrix & Results</button>
+                <button class="tab-link" onclick="switchTab('chartsTab', this)">Taguchi Main Effects Analysis</button>
             </div>
 
             <!-- Tab 1: Table -->
             <div id="tableTab" class="tab-content active">
-                <div class="table-wrapper">
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Run</th>
-                                <th>TCP Algorithm (A)</th>
-                                <th>Bandwidth (B)</th>
-                                <th>Delay (C)</th>
-                                <th>Throughput (Mbps)</th>
-                                <th>Stability Variance</th>
-                                <th>Retransmissions (%)</th>
+                                <th style="text-align: center; width: 60px;">Run</th>
+                                <th>TCP Algorithm</th>
+                                <th style="text-align: right;">Bandwidth</th>
+                                <th style="text-align: right;">Delay</th>
+                                <th style="text-align: right;">Throughput</th>
+                                <th style="text-align: right;">Stability (Var)</th>
+                                <th style="text-align: right;">Retransmissions</th>
                             </tr>
                         </thead>
                         <tbody id="resultsTableBody">
@@ -1111,35 +1108,44 @@ def index():
                         </tbody>
                     </table>
                 </div>
-                <button class="btn-export" onclick="exportCSV()">
-                    <span>Download CSV for Minitab/SPSS</span>
-                </button>
+                <div class="action-footer">
+                    <button class="btn-secondary" onclick="exportCSV()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top: 1px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export CSV for Minitab / SPSS</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Tab 2: Charts -->
             <div id="chartsTab" class="tab-content">
-                <div class="charts-container">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <span style="font-size: 0.95rem; color: var(--text-muted);">Main Effects Plot (Data Means)</span>
-                        <div class="chart-selector">
-                            <button class="tab-btn active" id="btnChartThroughput" onclick="changeChartResponse('throughput', this)">Throughput</button>
-                            <button class="tab-btn" id="btnChartRetrans" onclick="changeChartResponse('retrans_rate', this)">Retransmission</button>
-                            <button class="tab-btn" id="btnChartVariance" onclick="changeChartResponse('variance', this)">Variance</button>
+                <div class="charts-wrapper">
+                    <div class="charts-header">
+                        <span class="charts-title">Taguchi Factor Main Effects Plots (Data Means)</span>
+                        <div class="chart-nav">
+                            <button class="chart-nav-btn active" id="btnChartThroughput" onclick="changeChartResponse('throughput', this)">Throughput</button>
+                            <button class="chart-nav-btn" id="btnChartRetrans" onclick="changeChartResponse('retrans_rate', this)">Retransmission</button>
+                            <button class="chart-nav-btn" id="btnChartVariance" onclick="changeChartResponse('variance', this)">Variance</button>
                         </div>
                     </div>
                     
                     <div class="chart-grid">
-                        <div class="chart-panel">
+                        <div class="chart-box">
                             <h4>Factor A: TCP Congestion Control</h4>
-                            <canvas id="chartFactorA"></canvas>
+                            <div class="chart-canvas-container">
+                                <canvas id="chartFactorA"></canvas>
+                            </div>
                         </div>
-                        <div class="chart-panel">
+                        <div class="chart-box">
                             <h4>Factor B: Bandwidth (Mbps)</h4>
-                            <canvas id="chartFactorB"></canvas>
+                            <div class="chart-canvas-container">
+                                <canvas id="chartFactorB"></canvas>
+                            </div>
                         </div>
-                        <div class="chart-panel">
+                        <div class="chart-box">
                             <h4>Factor C: Delay (ms)</h4>
-                            <canvas id="chartFactorC"></canvas>
+                            <div class="chart-canvas-container">
+                                <canvas id="chartFactorC"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1147,8 +1153,8 @@ def index():
         </div>
 
         <div class="card" id="noDataCard">
-            <div class="no-data-msg">
-                No experimental data available. Please trigger the emulation script to populate results.
+            <div class="no-data">
+                No experimental data available. Execute the analyzer sequence to generate results.
             </div>
         </div>
     </div>
@@ -1159,52 +1165,65 @@ def index():
         let latestResultsData = null;
         let latestMainEffectsData = null;
 
-        // Initialize empty charts
         function initCharts() {
             const chartConfigs = {
-                chartFactorA: { el: 'chartFactorA', label: 'TCP Algo' },
-                chartFactorB: { el: 'chartFactorB', label: 'Bandwidth' },
-                chartFactorC: { el: 'chartFactorC', label: 'Delay' }
+                chartFactorA: 'chartFactorA',
+                chartFactorB: 'chartFactorB',
+                chartFactorC: 'chartFactorC'
             };
 
-            for (const [key, config] of Object.entries(chartConfigs)) {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#18151f',
+                        titleColor: '#e6e4eb',
+                        bodyColor: '#e6e4eb',
+                        borderColor: '#221f2d',
+                        borderWidth: 1,
+                        padding: 8,
+                        displayColors: false,
+                        titleFont: { family: 'Inter', size: 11, weight: 'bold' },
+                        bodyFont: { family: 'JetBrains Mono', size: 11 }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: '#1b1824', drawBorder: false },
+                        ticks: { color: '#807c91', font: { family: 'JetBrains Mono', size: 9 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#807c91', font: { family: 'Inter', size: 10 } }
+                    }
+                }
+            };
+
+            for (const [key, canvasId] of Object.entries(chartConfigs)) {
                 if (charts[key]) {
                     charts[key].destroy();
                 }
-                const ctx = document.getElementById(config.el).getContext('2d');
+                const ctx = document.getElementById(canvasId).getContext('2d');
                 charts[key] = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: [],
                         datasets: [{
-                            label: '',
                             data: [],
-                            borderColor: '#7f5af0',
-                            backgroundColor: 'rgba(127, 90, 240, 0.2)',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#ff9f43',
-                            pointBorderColor: '#fff',
-                            pointRadius: 6,
-                            tension: 0.1
+                            borderColor: '#826fed',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#cda15f',
+                            pointBorderColor: '#121016',
+                            pointBorderWidth: 1.5,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0,
+                            fill: false
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#9f9bbd' }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: { color: '#9f9bbd' }
-                            }
-                        }
-                    }
+                    options: chartOptions
                 });
             }
         }
@@ -1213,17 +1232,16 @@ def index():
             if (!latestMainEffectsData) return;
             currentResponse = responseType;
 
-            const mapping = {
-                throughput: { label: 'Throughput (Mbps)', color: '#7f5af0' },
-                retrans_rate: { label: 'Retransmission Rate (%)', color: '#ff9f43' },
-                variance: { label: 'Variance', color: '#a89fec' }
+            const configMapping = {
+                throughput: { color: '#826fed', pointColor: '#cda15f' },
+                retrans_rate: { color: '#cda15f', pointColor: '#826fed' },
+                variance: { color: '#807c91', pointColor: '#826fed' }
             };
 
-            const selected = mapping[responseType];
+            const theme = configMapping[responseType];
 
             // Factor A (Algo)
             const algoData = latestMainEffectsData.algo;
-            const algoLabels = ['Reno', 'Cubic', 'BBR'];
             const algoVals = [
                 algoData['reno'][responseType],
                 algoData['cubic'][responseType],
@@ -1232,7 +1250,6 @@ def index():
 
             // Factor B (BW)
             const bwData = latestMainEffectsData.bw;
-            const bwLabels = ['100', '500', '1000'];
             const bwVals = [
                 bwData['100'][responseType],
                 bwData['500'][responseType],
@@ -1241,7 +1258,6 @@ def index():
 
             // Factor C (Delay)
             const delayData = latestMainEffectsData.delay;
-            const delayLabels = ['10', '50', '100'];
             const delayVals = [
                 delayData['10'][responseType],
                 delayData['50'][responseType],
@@ -1249,41 +1265,40 @@ def index():
             ];
 
             // Update Chart A
-            charts.chartFactorA.data.labels = algoLabels;
+            charts.chartFactorA.data.labels = ['Reno', 'Cubic', 'BBR'];
             charts.chartFactorA.data.datasets[0].data = algoVals;
-            charts.chartFactorA.data.datasets[0].borderColor = selected.color;
-            charts.chartFactorA.data.datasets[0].label = selected.label;
+            charts.chartFactorA.data.datasets[0].borderColor = theme.color;
+            charts.chartFactorA.data.datasets[0].pointBackgroundColor = theme.pointColor;
             charts.chartFactorA.update();
 
             // Update Chart B
-            charts.chartFactorB.data.labels = bwLabels;
+            charts.chartFactorB.data.labels = ['100M', '500M', '1G'];
             charts.chartFactorB.data.datasets[0].data = bwVals;
-            charts.chartFactorB.data.datasets[0].borderColor = selected.color;
-            charts.chartFactorB.data.datasets[0].label = selected.label;
+            charts.chartFactorB.data.datasets[0].borderColor = theme.color;
+            charts.chartFactorB.data.datasets[0].pointBackgroundColor = theme.pointColor;
             charts.chartFactorB.update();
 
             // Update Chart C
-            charts.chartFactorC.data.labels = delayLabels;
+            charts.chartFactorC.data.labels = ['10ms', '50ms', '100ms'];
             charts.chartFactorC.data.datasets[0].data = delayVals;
-            charts.chartFactorC.data.datasets[0].borderColor = selected.color;
-            charts.chartFactorC.data.datasets[0].label = selected.label;
+            charts.chartFactorC.data.datasets[0].borderColor = theme.color;
+            charts.chartFactorC.data.datasets[0].pointBackgroundColor = theme.pointColor;
             charts.chartFactorC.update();
         }
 
         function changeChartResponse(responseType, element) {
-            document.querySelectorAll('.chart-selector .tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.chart-nav-btn').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
             updateCharts(responseType);
         }
 
         function switchTab(tabId, element) {
-            document.querySelectorAll('.tabs-header .tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tabs .tab-link').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
             element.classList.add('active');
             document.getElementById(tabId).classList.add('active');
 
-            // Resize charts on display to fix rendering bugs in hidden canvases
             if (tabId === 'chartsTab') {
                 setTimeout(() => {
                     Object.values(charts).forEach(c => c.resize());
@@ -1296,19 +1311,18 @@ def index():
             const line = document.createElement('div');
             line.className = 'terminal-line';
             
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'terminal-time';
-            timeSpan.textContent = `[${time}]`;
+            const promptSpan = document.createElement('span');
+            promptSpan.className = 'terminal-prompt';
+            promptSpan.textContent = '$';
             
             const textSpan = document.createElement('span');
             textSpan.className = `terminal-text text-${type}`;
             textSpan.textContent = text;
             
-            line.appendChild(timeSpan);
+            line.appendChild(promptSpan);
             line.appendChild(textSpan);
             terminal.appendChild(line);
             
-            // Auto scroll to bottom
             terminal.scrollTop = terminal.scrollHeight;
         }
 
@@ -1316,11 +1330,10 @@ def index():
             const btn = document.getElementById('btnRunSim');
             btn.disabled = true;
             btn.classList.add('running');
-            btn.innerHTML = '<span class="spinner"></span> <span>Running Simulation...</span>';
+            btn.innerHTML = '<span class="spinner"></span> <span>Running Analysis...</span>';
 
-            // Clear terminal
             document.getElementById('terminal').innerHTML = '';
-            appendTerminalLine(new Date().toLocaleTimeString(), 'Contacting server...', 'info');
+            appendTerminalLine(new Date().toLocaleTimeString(), 'Initiating HTTP handshake with server...', 'info');
 
             fetch('/api/run', { method: 'POST' })
                 .then(res => res.json())
@@ -1328,12 +1341,12 @@ def index():
                     if (data.status === 'started') {
                         setupLogStream();
                     } else {
-                        appendTerminalLine(new Date().toLocaleTimeString(), 'Error: ' + data.message, 'error');
+                        appendTerminalLine(new Date().toLocaleTimeString(), 'Execution aborted: ' + data.message, 'error');
                         resetRunButton();
                     }
                 })
                 .catch(err => {
-                    appendTerminalLine(new Date().toLocaleTimeString(), 'Connection failure: ' + err, 'error');
+                    appendTerminalLine(new Date().toLocaleTimeString(), 'Server connection failed: ' + err, 'error');
                     resetRunButton();
                 });
         }
@@ -1342,7 +1355,7 @@ def index():
             const btn = document.getElementById('btnRunSim');
             btn.disabled = false;
             btn.classList.remove('running');
-            btn.innerHTML = '<span>Initiate Emulation</span>';
+            btn.innerHTML = '<span>Run Analyzer Sequence</span>';
         }
 
         function setupLogStream() {
@@ -1353,7 +1366,7 @@ def index():
                 
                 if (data.type === 'status' && data.status === 'done') {
                     eventSource.close();
-                    appendTerminalLine(new Date().toLocaleTimeString(), 'Event stream closed. Fetching results...', 'info');
+                    appendTerminalLine(new Date().toLocaleTimeString(), 'Sequence terminated. Pulling data matrices...', 'success');
                     fetchResults();
                     resetRunButton();
                 } else {
@@ -1362,7 +1375,7 @@ def index():
             };
 
             eventSource.onerror = function(err) {
-                console.error('SSE Error:', err);
+                console.error('SSE connection lost:', err);
                 eventSource.close();
                 resetRunButton();
             };
@@ -1375,22 +1388,19 @@ def index():
                     if (data.results && data.results.length > 0) {
                         latestResultsData = data.results;
                         latestMainEffectsData = data.main_effects;
-                        
                         populateUI(data.results, data.main_effects);
                     }
                 })
                 .catch(err => {
-                    console.error('Error fetching results:', err);
+                    console.error('Failed to retrieve results:', err);
                 });
         }
 
         function populateUI(results, mainEffects) {
-            // Unhide metrics and results
             document.getElementById('metricsGrid').style.display = 'grid';
             document.getElementById('resultsCard').style.display = 'block';
             document.getElementById('noDataCard').style.display = 'none';
 
-            // Calculate overall averages
             let totalThr = 0, totalVar = 0, totalRetr = 0;
             results.forEach(r => {
                 totalThr += r.throughput;
@@ -1405,24 +1415,22 @@ def index():
             document.getElementById('valAvgVariance').innerText = avgVar.toFixed(4);
             document.getElementById('valAvgRetrans').innerText = `${avgRetr.toFixed(4)} %`;
 
-            // Populate table
             const tbody = document.getElementById('resultsTableBody');
             tbody.innerHTML = '';
             results.forEach(r => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="highlight-cell">${r.run}</td>
-                    <td class="highlight-cell" style="text-transform: uppercase;">${r.algo}</td>
-                    <td>${r.bw} Mbps</td>
-                    <td>${r.delay} ms</td>
-                    <td class="highlight-cell" style="color: var(--secondary);">${r.throughput.toFixed(2)}</td>
-                    <td>${r.variance.toFixed(4)}</td>
-                    <td class="highlight-cell" style="color: var(--fusion);">${r.retrans_rate.toFixed(4)}</td>
+                    <td style="text-align: center;" class="font-mono-data">${r.run}</td>
+                    <td style="font-weight: 500; text-transform: uppercase;">${r.algo}</td>
+                    <td style="text-align: right;" class="font-mono-data">${r.bw} Mbps</td>
+                    <td style="text-align: right;" class="font-mono-data">${r.delay} ms</td>
+                    <td style="text-align: right; font-weight: 600;" class="font-mono-data">${r.throughput.toFixed(2)}</td>
+                    <td style="text-align: right; color: var(--text-muted);" class="font-mono-data">${r.variance.toFixed(4)}</td>
+                    <td style="text-align: right; font-weight: 600; color: var(--accent);" class="font-mono-data">${r.retrans_rate.toFixed(4)}%</td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            // Update Charts
             updateCharts(currentResponse);
         }
 
@@ -1430,10 +1438,8 @@ def index():
             window.location.href = '/api/export';
         }
 
-        // Initialize on load
         window.onload = function() {
             initCharts();
-            // Check if there are existing results from a previous run
             fetchResults();
         };
     </script>
